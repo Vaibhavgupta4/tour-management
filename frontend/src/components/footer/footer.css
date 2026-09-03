@@ -1,0 +1,265 @@
+.footer{
+    padding-top: 70px;
+    padding-bottom: 30px;
+}
+/* brand column must be vertical stack: img on top -> p -> socials — header .logo flex was leaking */
+.footer .logo{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+.footer .logo img{
+    width: 50%;
+    max-width: 180px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin-bottom: 1rem;
+}
+.footer .logo p{
+    color: var(--text-color);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    text-align: left;
+    width: 100%;
+}
+.footer .logo .social__links{
+    justify-content: flex-start;
+    width: 100%;
+}
+.footer__links-title{
+    color: var(--heading-color);
+    margin-bottom: 1rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+.footer__quick-links li{
+    padding: 0.28rem 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+.footer__quick-links li a{
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    transition: color .2s;
+}
+.footer__quick-links li a:hover{
+    color: var(--secondary-color);
+}
+.footer__quick-links h6{
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--heading-color);
+    white-space: nowrap;
+}
+.footer__quick-links h6 span i{
+    color: var(--secondary-color);
+    font-size: 1rem;
+}
+.footer__quick-links p{
+    margin-bottom: 0;
+    font-size: 0.88rem;
+    color: var(--text-color);
+}
+.social__links span a{
+    color: var(--heading-color);
+    font-size: 1.15rem;
+    text-decoration: none;
+}
+.social__links span a:hover{
+    color: var(--secondary-color);
+}
+.copyright{
+    color: var(--text-color);
+    font-size: 0.9rem;
+    border-top: 1px solid #eee;
+    padding-top: 18px;
+    margin-top: 8px;
+}
+
+/* iPad Pro 1024 — keep desktop 4-col but prevent squeeze; desktop >1024 untouched */
+@media only screen and (min-width: 993px) and (max-width: 1024px) {
+    .footer{
+        padding-top: 50px;
+        padding-bottom: 24px;
+    }
+    .footer .logo img{
+        width: 42%;
+        max-width: 150px;
+    }
+    .footer .logo p{
+        font-size: 0.85rem;
+    }
+    .footer__links-title{
+        font-size: 1.05rem;
+        margin-bottom: 0.8rem;
+    }
+    .footer__quick-links li a{
+        font-size: 0.88rem;
+    }
+    .footer__quick-links h6{
+        font-size: 0.82rem;
+    }
+    .footer__quick-links p{
+        font-size: 0.82rem;
+    }
+    .footer__quick-links li{
+        padding: 0.22rem 0 !important;
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    .footer{
+        padding-top: 45px;
+        padding-bottom: 20px;
+    }
+    /* keep brand as original vertical stack: img -> p -> socials, just centered */
+    .footer__col--brand{
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 1.6rem;
+    }
+    .footer__col--brand .logo{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+    }
+    .footer .logo img{
+        width: 42%;
+        max-width: 170px;
+    }
+    .footer__col--brand .logo p{
+        max-width: 560px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+    }
+    .footer__col--brand .social__links{
+        justify-content: center;
+    }
+    /* Discover | Quick Links side-by-side, centered */
+    .footer__col--links{
+        text-align: center;
+    }
+    .footer__col--links .footer__links-title{
+        text-align: center;
+    }
+    .footer__col--links .footer__quick-links{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .footer__col--links .footer__quick-links li{
+        text-align: center;
+        padding: 0.22rem 0 !important;
+    }
+    /* Contact centered below, compact */
+    .footer__col--contact{
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 1.1rem;
+        padding-top: 1.1rem;
+        border-top: 1px solid #f0f0f0;
+    }
+    .footer__col--contact .footer__links-title{
+        text-align: center;
+        margin-bottom: 0.7rem;
+    }
+    .footer__col--contact .footer__quick-links{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.15rem;
+        width: 100%;
+        max-width: 420px;
+    }
+    .footer__col--contact .footer__quick-links li{
+        justify-content: center;
+        gap: 0.45rem !important;
+        padding: 0.18rem 0 !important;
+    }
+    .footer__col--contact .footer__quick-links p{
+        font-size: 0.85rem;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .footer{
+        padding-top: 36px;
+    }
+    .footer .logo img{
+        width: 38%;
+        max-width: 150px;
+    }
+    .footer .logo p{
+        font-size: 0.85rem;
+    }
+    .footer__links-title{
+        font-size: 1.05rem;
+    }
+    .footer__quick-links li a{
+        font-size: 0.88rem;
+    }
+    .footer__col--brand{
+        margin-bottom: 1.2rem;
+    }
+    .footer__col--contact{
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+    .copyright{
+        font-size: 0.82rem;
+        padding-top: 14px;
+    }
+}
+
+@media only screen and (max-width: 576px) {
+    .footer{
+        padding-top: 30px;
+    }
+    .footer .logo img{
+        width: 44%;
+        max-width: 130px;
+    }
+    .footer .logo p{
+        font-size: 0.8rem;
+        line-height: 1.55;
+    }
+    .footer__links-title{
+        font-size: 0.98rem;
+        margin-bottom: 0.5rem;
+    }
+    .footer__quick-links li{
+        padding: 0.16rem 0 !important;
+    }
+    .footer__quick-links li a{
+        font-size: 0.82rem;
+    }
+    .footer__quick-links h6{
+        font-size: 0.8rem;
+    }
+    .footer__quick-links p{
+        font-size: 0.78rem;
+    }
+    .footer__col--contact{
+        margin-top: 0.9rem;
+        padding-top: 0.9rem;
+    }
+    .footer__col--contact .footer__quick-links{
+        gap: 0.1rem;
+    }
+    .copyright{
+        font-size: 0.78rem;
+        line-height: 1.4;
+        padding-top: 12px;
+    }
+}

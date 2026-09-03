@@ -1,0 +1,47 @@
+.thank__you span i{
+    font-size: 4rem;
+    color: green;
+}
+.thank__you h1{
+    font-size: 3.6rem;
+    font-family: var(--subtitle-font-name);
+}
+
+@media only screen and (max-width: 992px) {
+    .thank__you h1{
+        font-size: 3rem;
+    }
+    .thank__you span i{
+        font-size: 3.5rem;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .thank__you h1{
+        font-size: 2.5rem;
+    }
+    .thank__you h3{
+        font-size: 1.3rem;
+    }
+    .thank__you span i{
+        font-size: 3rem;
+    }
+    .thank__you .primary__btn{
+        width: 50% !important;
+    }
+}
+
+@media only screen and (max-width: 576px) {
+    .thank__you h1{
+        font-size: 2rem;
+    }
+    .thank__you h3{
+        font-size: 1.1rem;
+    }
+    .thank__you span i{
+        font-size: 2.5rem;
+    }
+    .thank__you .primary__btn{
+        width: 80% !important;
+    }
+}
