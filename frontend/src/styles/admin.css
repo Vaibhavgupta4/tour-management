@@ -1,0 +1,301 @@
+/* ===== Admin Dashboard ===== */
+.admin__page {
+  min-height: 60vh;
+}
+
+.admin__page h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--heading-color);
+}
+
+.admin__page h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Tabs */
+.admin__tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 1.5rem;
+}
+
+.admin__tab {
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+.admin__tab:hover {
+  color: var(--heading-color);
+}
+
+.admin__tab.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+/* Stats Cards */
+.admin__stats {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.admin__stat-card {
+  flex: 1;
+  min-width: 160px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.admin__stat-card .stat__icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.6rem;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.admin__stat-card .stat__icon.tours { background: var(--primary-color); }
+.admin__stat-card .stat__icon.users { background: #28a745; }
+.admin__stat-card .stat__icon.bookings { background: #007bff; }
+
+.admin__stat-card .stat__number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--heading-color);
+}
+
+.admin__stat-card .stat__label {
+  font-size: 0.9rem;
+  color: var(--text-color);
+  margin-top: 0.2rem;
+}
+
+/* Table */
+.admin__table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.admin__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+.admin__table thead {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.admin__table th {
+  padding: 0.8rem;
+  text-align: left;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.admin__table td {
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.admin__table tbody tr:hover {
+  background: #fafafa;
+}
+
+.admin__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Action Buttons */
+.admin__actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.admin__btn {
+  padding: 0.3rem 0.7rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.admin__btn:hover {
+  opacity: 0.85;
+}
+
+.admin__btn.edit {
+  background: var(--secondary-color);
+  color: #fff;
+}
+
+.admin__btn.delete {
+  background: #dc3545;
+  color: #fff;
+}
+
+.admin__btn.add {
+  background: #28a745;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 5px;
+}
+
+.admin__btn.back {
+  background: #6c757d;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.admin__btn.cancel {
+  background: #6c757d;
+  color: #fff;
+}
+
+/* Tour form */
+.admin__form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.admin__form .form__group {
+  margin-bottom: 1rem;
+}
+
+.admin__form label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  color: var(--heading-color);
+}
+
+.admin__form input,
+.admin__form textarea,
+.admin__form select {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: var(--font-name);
+  font-size: 0.9rem;
+}
+
+.admin__form input:focus,
+.admin__form textarea:focus,
+.admin__form select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.admin__form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.admin__form .form__check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin__form .form__check input[type="checkbox"] {
+  width: auto;
+}
+
+.admin__form .form__btns {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+/* Booking card */
+.admin__booking-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.admin__booking-card h6 {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.admin__booking-card .booking__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+.admin__booking-card .booking__meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Loading / Empty */
+.admin__loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-color);
+}
+
+.admin__empty {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-color);
+  font-style: italic;
+}
+
+/* Responsive */
+@media only screen and (max-width: 768px) {
+  .admin__stats {
+    gap: 0.8rem;
+  }
+  .admin__stat-card {
+    min-width: 120px;
+  }
+  .admin__table th,
+  .admin__table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+  .admin__tabs {
+    overflow-x: auto;
+  }
+}

@@ -9,6 +9,9 @@ import Register from '../pages/Register';
 import SearchResultList from '../pages/SearchResultList';
 import About from '../pages/About';
 import ThankYou from '../pages/ThankYou';
+import AdminDashboard from '../pages/AdminDashboard';
+import AdminCreateTour from '../pages/AdminCreateTour';
+import AdminEditTour from '../pages/AdminEditTour';
 
 const Routers = () => {
   return (
@@ -22,6 +25,9 @@ const Routers = () => {
         <Route path='/thank-you' element={<ThankYou />} />
         <Route path='/about' element={<About/>} />
         <Route path='/tours/search' element={<SearchResultList/>} />
+        <Route path='/admin' element={<AdminDashboard/>} />
+        <Route path='/admin/tours/new' element={<AdminCreateTour/>} />
+        <Route path='/admin/tours/edit/:id' element={<AdminEditTour/>} />
     </Routes>
   )
 }

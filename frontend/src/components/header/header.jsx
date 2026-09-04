@@ -75,6 +75,13 @@ const Header = () => {
                       <NavLink to={item.path} className={navClass=> navClass.isActive ? "active__link" : ""} onClick={closeMenu}>{item.display}</NavLink>
                     </li>
                   ))}
+                  {user?.role === 'admin' && (
+                    <li className="nav__item">
+                      <NavLink to="/admin" className={navClass=> navClass.isActive ? "active__link" : ""} onClick={closeMenu}>
+                        <i className="ri-dashboard-line"></i> Admin
+                      </NavLink>
+                    </li>
+                  )}
               </ul>
             </div>
           {/* ========= menu end ======== */}

@@ -51,7 +51,7 @@ export const login = async (req, res) => {
             return res.status(401).json({ success: false, message: 'Incorrect email or password' })
         }
 
-        const { password: _pwd, role, ...rest } = user._doc
+        const { password: _pwd, ...rest } = user._doc
 
         if (!process.env.JWT_SECRET_KEY) {
             console.error('[login] JWT_SECRET_KEY missing')
@@ -79,8 +79,7 @@ export const login = async (req, res) => {
             success: true,
             message: 'Successfully logged in',
             token, // also return for Authorization: Bearer fallback (mobile / cross-site)
-            data: { ...rest },
-            role,
+            data: { ...rest }, // rest now includes role field
         })
 
     } catch (error) {

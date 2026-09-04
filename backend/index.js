@@ -8,6 +8,10 @@ import tourRoute from './routes/tours.js'
 import userRoute from './routes/user.js'
 import reviewRoute from './routes/reviews.js'
 import bookingRoute from './routes/booking.js'
+import { verifyAdmin } from './utils/verifyToken.js'
+import Tour from './models/Tour.js'
+import User from './models/User.js'
+import Booking from './models/Booking.js'
 
 dotenv.config()
 const app = express()
@@ -169,6 +173,23 @@ app.use('/api/v1/users', userRoute)
 app.use('/api/v1/reviews', reviewRoute)
 app.use('/api/v1/review', reviewRoute)
 app.use('/api/v1/booking', bookingRoute)
+
+// ----- admin stats (counts for dashboard) -----
+app.get('/api/v1/admin/stats', verifyAdmin, async (req, res) => {
+  try {
+    const [tourCount, userCount, bookingCount] = await Promise.all([
+      Tour.estimatedDocumentCount(),
+      User.estimatedDocumentCount(),
+      Booking.estimatedDocumentCount(),
+    ])
+    res.status(200).json({
+      success: true,
+      data: { tourCount, userCount, bookingCount },
+    })
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch stats' })
+  }
+})
 
 // ----- 404 -----
 app.use((req, res) => {

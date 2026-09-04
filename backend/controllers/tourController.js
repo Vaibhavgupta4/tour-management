@@ -10,7 +10,15 @@ export const createTour = async (req, res) => {
 
         res.status(200).json({success:true, message:'succesfully created', data:savedTour})
     } catch (err) {
-        res.status(500).json({success:false, message:'failed to create'})
+        if (err?.name === 'ValidationError') {
+            const fields = Object.keys(err.errors).join(', ')
+            return res.status(400).json({success:false, message:`Missing required fields: ${fields}`})
+        }
+        if (err?.code === 11000) {
+            return res.status(409).json({success:false, message:'A tour with that title already exists'})
+        }
+        console.error('[createTour]', err.message)
+        res.status(500).json({success:false, message:'failed to create: ' + err.message})
     }
 }
 
@@ -76,10 +84,16 @@ export const getSingleTour = async (req, res) => {
 export const getAllTour = async (req, res) => {
 
   const page = parseInt(req.query.page) || 0
+  const fetchAll = req.query.all === 'true'
   
     try {
 
-      const tours = await Tour.find({}).skip( page * 8 ) .limit(8).populate('reviews')
+      let query = Tour.find({}).populate('reviews')
+      if (!fetchAll) {
+        query = query.skip(page * 8).limit(8)
+      }
+
+      const tours = await query
 
       res.status(200).json({
         success:true, count:tours.length, message: "successfully found", data: tours,
