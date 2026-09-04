@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffa940"/>
+      <stop offset="100%" stop-color="#ff7e01"/>
+    </linearGradient>
+  </defs>
+  <!-- Map pin body -->
+  <path d="M32 4C21 4 12 13 12 24c0 15 20 36 20 36s20-21 20-36C52 13 43 4 32 4z" fill="url(#g)"/>
+  <!-- Inner circle (pin hole) -->
+  <circle cx="32" cy="23" r="9" fill="#fff"/>
+</svg>
