@@ -28,7 +28,12 @@ const Header = () => {
   const {user,dispatch} = useContext(AuthContext)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      // clear httpOnly cookie on server (best-effort — still logout locally even if it fails)
+      const { BASE_URL } = await import('../../utils/config')
+      await fetch(`${BASE_URL}/auth/logout`, { method: 'POST', credentials: 'include' })
+    } catch {}
     dispatch({type:'LOGOUT'})
     navigate('/home')
   }

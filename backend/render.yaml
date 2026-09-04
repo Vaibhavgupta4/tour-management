@@ -1,0 +1,23 @@
+# Render Blueprint — backend only (use as reference or deploy via dashboard)
+# Dashboard: New → Web Service → connect repo → Root Directory = backend
+services:
+  - type: web
+    name: tour-management-api
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false # set in Render dashboard — your Atlas URI
+      - key: JWT_SECRET_KEY
+        generateValue: true # or sync: false to set manually
+      - key: FRONTEND_URL
+        sync: false # e.g. https://your-frontend.vercel.app
+    autoDeploy: true
