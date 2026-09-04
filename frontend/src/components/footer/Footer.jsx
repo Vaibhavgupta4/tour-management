@@ -113,7 +113,7 @@ const footer = () => {
           </Col>
 
           <Col lg='12' className='text-center pt-4 pt-md-5'>
-              <p className='copyright mb-0'>Copyright {year}, design and develop by Vaibhav Gupta. All rights reserved.</p>
+              <p className='copyright mb-0'>Copyright {year}, designed and developed by Vaibhav Gupta. All rights reserved.</p>
           </Col>
         </Row>
       </Container>

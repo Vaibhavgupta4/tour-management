@@ -19,11 +19,42 @@ const Booking = ({ tour, avgRating }) => {
   })
 
   const handleChange = e => {
-    setBookingData(prev=>({...prev, [e.target.id]:e.target.value}))
+    const { id, value } = e.target
+    // guestSize: never allow empty/0/negative to break the total — clamp to >=1
+    // keep controlled input but sanitize on every keystroke
+    if (id === 'guestSize') {
+      if (value === '') {
+        setBookingData(prev=>({...prev, [id]: ''}))
+        return
+      }
+      const num = Number(value)
+      if (!Number.isFinite(num) || num < 1) {
+        setBookingData(prev=>({...prev, [id]: 1}))
+        return
+      }
+      // floor to avoid decimals, cap at reasonable max if needed
+      setBookingData(prev=>({...prev, [id]: Math.floor(num)}))
+      return
+    }
+    setBookingData(prev=>({...prev, [id]:value}))
+  }
+
+  const handleGuestBlur = () => {
+    // if user leaves field empty, restore default 1 so total never shows only service fee
+    const n = Number(bookingData.guestSize)
+    if (bookingData.guestSize === '' || !Number.isFinite(n) || n < 1) {
+      setBookingData(prev=>({...prev, guestSize: 1}))
+    }
   }
 
   const serviceFee = 10
-  const totalAmount  = Number(price) * Number(bookingData.guestSize) + Number(serviceFee)
+  // always count at least 1 guest — empty string or 0 would otherwise make price * 0 + fee = $10
+  const safeGuestSize = (() => {
+    const n = Number(bookingData.guestSize)
+    if (!Number.isFinite(n) || n < 1) return 1
+    return Math.floor(n)
+  })()
+  const totalAmount  = Number(price) * safeGuestSize + Number(serviceFee)
 
   const handleClick = async e=>{
     e.preventDefault()
@@ -33,6 +64,13 @@ const Booking = ({ tour, avgRating }) => {
       return navigate("/login")
     }
 
+    // clamp guest strictly before sending — empty field must count as 1
+    if (!safeGuestSize || safeGuestSize < 1) {
+      setBookingData(prev=>({...prev, guestSize: 1}))
+      alert('Guest size must be at least 1')
+      return
+    }
+
     try {
       const payload = {
         userId: user._id,
@@ -40,7 +78,7 @@ const Booking = ({ tour, avgRating }) => {
         tourName: tourName || tour.title,
         fullName: bookingData.fullName,
         phone: bookingData.phone,
-        guestSize: Number(bookingData.guestSize),
+        guestSize: safeGuestSize,
         bookAt: bookingData.bookAt,
       }
 
@@ -77,14 +115,18 @@ const Booking = ({ tour, avgRating }) => {
       <h5>Information</h5>
       <Form className='booking__info-form' onSubmit={handleClick}>
         <FormGroup>
-          <input type="text" placeholder='Full Name' id='fullName' required onChange={handleChange}/>
+          <input type="text" placeholder='Full Name' id='fullName' required value={bookingData.fullName} onChange={handleChange}/>
         </FormGroup>
         <FormGroup>
-          <input type="number" placeholder='Phone' id='phone' required onChange={handleChange}/>
+          <input type="number" placeholder='Phone' id='phone' required value={bookingData.phone} onChange={handleChange}/>
         </FormGroup>
         <FormGroup className='d-flex align-items-center gap-3'>
-          <input type="date" placeholder='' id='bookAt' required onChange={handleChange}/>
-          <input type="number" placeholder='guest' id='guestSize' required onChange={handleChange}/>
+          <input type="date" placeholder='' id='bookAt' required value={bookingData.bookAt} onChange={handleChange}/>
+          <input type="number" placeholder='guest' id='guestSize' required
+            min="1" step="1"
+            value={bookingData.guestSize}
+            onChange={handleChange}
+            onBlur={handleGuestBlur}/>
         </FormGroup>
       </Form>
     </div>
@@ -93,12 +135,12 @@ const Booking = ({ tour, avgRating }) => {
     <div className="booking__bottom">
       <ListGroup>
         <ListGroupItem className='border-0 px-0'>
-          <h5>${price} <i className="ri-close-line"></i> 1 person </h5>
-          <span> ${price}</span>
+          <h5>${price} <i className="ri-close-line"></i> {safeGuestSize} person{safeGuestSize > 1 ? 's' : ''} </h5>
+          <span> ${Number(price) * safeGuestSize}</span>
         </ListGroupItem>
         <ListGroupItem className='border-0 px-0'>
           <h5>Service Charge </h5>
-          <span> $10</span>
+          <span> ${serviceFee}</span>
         </ListGroupItem>
         <ListGroupItem className='border-0 px-0 total'>
           <h5>Total</h5>

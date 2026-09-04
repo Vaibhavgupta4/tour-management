@@ -23,6 +23,11 @@ const bookingSchema = new mongoose.Schema(
     guestSize: {
       type: Number,
       required: true,
+      min: [1, 'Guest size must be at least 1'],
+      validate: {
+        validator: v => Number.isInteger(v) && v >= 1,
+        message: 'Guest size must be an integer >= 1',
+      },
     },
     bookAt: {
       type: Date,

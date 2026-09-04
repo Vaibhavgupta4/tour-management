@@ -141,8 +141,14 @@
         margin-right: auto;
         text-align: center;
     }
+    /* FIX: socials stuck left on mobile — base .footer .logo .social__links (0,3,0) was beating this (0,2,0) */
+    .footer .logo .social__links,
+    .footer__col--brand .logo .social__links,
     .footer__col--brand .social__links{
-        justify-content: center;
+        justify-content: center !important;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
     }
     /* Discover | Quick Links side-by-side, centered */
     .footer__col--links{

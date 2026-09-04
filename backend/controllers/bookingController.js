@@ -6,13 +6,25 @@ import Booking from '../models/Booking.js'
 export const createBooking = async (req, res) => {
     // assign the userId from the verified token when it isn't provided
     const userId = req.body.userId || (req.user && req.user.id)
-    const newBooking = new Booking({ ...req.body, userId })
+
+    // sanitize guestSize — never allow 0 / empty / negative to save $10-only booking
+    let guestSize = Number(req.body.guestSize)
+    if (!Number.isFinite(guestSize) || guestSize < 1) {
+        return res.status(400).json({success:false, message:'Guest size must be at least 1'})
+    }
+    guestSize = Math.floor(guestSize)
+
+    const newBooking = new Booking({ ...req.body, userId, guestSize })
 
     try {
         const savedBooking = await newBooking.save()
 
         res.status(200).json({success:true, message:'succesfully created', data:savedBooking})
     } catch (err) {
+        // surface mongoose validation (e.g., guestSize min) as 400
+        if (err?.name === 'ValidationError') {
+            return res.status(400).json({success:false, message: err.message})
+        }
         res.status(500).json({success:false, message:'failed to create'})
     }
 }
