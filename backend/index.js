@@ -29,15 +29,16 @@ if (missing.length) {
 // e.g. FRONTEND_URL=https://your-frontend.vercel.app,https://your-frontend.netlify.app,http://localhost:3000
 const rawFrontend = process.env.FRONTEND_URL || process.env.FRONTEND_URLS || (NODE_ENV === 'production' ? '' : 'http://localhost:3000,http://localhost:5173')
 const ALLOWED_ORIGINS = rawFrontend.split(',').map(s => s.trim()).filter(Boolean)
+console.log(`[cors] NODE_ENV=${NODE_ENV} | ALLOWED_ORIGINS=${ALLOWED_ORIGINS.length ? ALLOWED_ORIGINS.join(', ') : '(empty — CORS will block all cross-origin requests!)'} | VERCEL=${process.env.VERCEL || 'no'}`)
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true) // curl/postman
+    if (!origin) return callback(null, true) // curl/postman/no-origin
     if (ALLOWED_ORIGINS.length === 0) {
-      return callback(new Error(`CORS blocked: ${origin} not in ALLOWED_ORIGINS. Set FRONTEND_URL env.`))
+      return callback(new Error(`CORS blocked: ALLOWED_ORIGINS is empty. Set FRONTEND_URL env var in Vercel. Received origin: ${origin}`))
     }
     if (ALLOWED_ORIGINS.includes('*') || ALLOWED_ORIGINS.includes(origin)) return callback(null, true)
-    return callback(new Error(`CORS blocked: ${origin} not allowed`))
+    return callback(new Error(`CORS blocked: origin "${origin}" is not in ALLOWED_ORIGINS [${ALLOWED_ORIGINS.join(', ')}]`))
   },
   credentials: true,
   methods: ['GET','POST','PUT','DELETE','OPTIONS','PATCH'],
@@ -116,7 +117,19 @@ app.use(async (req, res, next) => {
 
 // ----- health checks -----
 app.get('/', (req, res) => {
-  res.status(200).json({ success: true, message: 'Tour Management API is running', env: NODE_ENV, uptime: process.uptime(), db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' })
+  res.status(200).json({
+    success: true,
+    message: 'Tour Management API is running',
+    env: NODE_ENV,
+    uptime: process.uptime(),
+    db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    cors: {
+      nodeEnv: NODE_ENV,
+      allowedOrigins: ALLOWED_ORIGINS,
+      hasFrontendUrl: !!process.env.FRONTEND_URL,
+      frontendUrlRaw: process.env.FRONTEND_URL ? '(set)' : '(NOT SET)',
+    }
+  })
 })
 app.get('/health', async (req, res) => {
   // Try to ensure DB is connected before reporting — this is what users expect.
@@ -135,6 +148,18 @@ app.get('/api/v1/health', async (req, res) => {
   const state = mongoose.connection.readyState
   const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' }
   res.status(200).json({ success: true, status: 'ok', db: states[state] || state, readyState: state })
+})
+
+// ----- CORS debug (always returns CORS headers so browser can read it) -----
+app.get('/api/v1/cors-debug', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'If you can read this, CORS is working for this endpoint',
+    receivedOrigin: req.headers.origin || '(none — same-origin or curl)',
+    allowedOrigins: ALLOWED_ORIGINS,
+    frontendUrlEnv: process.env.FRONTEND_URL || '(NOT SET)',
+    nodeEnv: NODE_ENV,
+  })
 })
 
 // ----- routes -----
