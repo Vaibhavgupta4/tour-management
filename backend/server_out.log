@@ -1,4 +1,0 @@
-◇ injected env (3) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
-◇ injected env (0) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
-server is running on port 4000
-MongoDB database connected
