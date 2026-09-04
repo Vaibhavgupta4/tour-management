@@ -73,12 +73,14 @@ const rateLimiter = (req, res, next) => {
 
 // ----- DB connect helper -----
 const connectDB = async () => {
+  if (mongoose.connection.readyState === 1) return          // already connected
   try {
     await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 15000 })
     console.log('MongoDB database connected')
   } catch (err) {
     console.error('MongoDB connection failed:', err.message)
-    if (NODE_ENV === 'production') {
+    // Vercel serverless: retry once, then throw (never process.exit — it kills the function)
+    if (!process.env.VERCEL && NODE_ENV === 'production') {
       console.log('Retrying MongoDB in 5s...')
       await new Promise(r=>setTimeout(r,5000))
       try { await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 15000 }); console.log('MongoDB reconnected'); return }
@@ -103,8 +105,9 @@ app.use(cookieParser())
 // On traditional hosts, mongoose is already connected — this is a no-op.
 app.use(async (req, res, next) => {
   if (mongoose.connection.readyState === 1) return next()
-  // skip DB connect for health checks to avoid Atlas timeout masking
-  if (req.path === '/' || req.path === '/health' || req.path === '/api/v1/health') return next()
+  // Only skip DB for root '/' to keep cold-start health fast.
+  // /health and /api/v1/health SHOULD try to connect so you see the real status.
+  if (req.path === '/') return next()
   try {
     await connectDB()
     next()
@@ -113,15 +116,25 @@ app.use(async (req, res, next) => {
 
 // ----- health checks -----
 app.get('/', (req, res) => {
-  res.status(200).json({ success: true, message: 'Tour Management API is running', env: NODE_ENV, uptime: process.uptime() })
+  res.status(200).json({ success: true, message: 'Tour Management API is running', env: NODE_ENV, uptime: process.uptime(), db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' })
 })
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
+  // Try to ensure DB is connected before reporting — this is what users expect.
+  // If Atlas is unreachable this will still return quickly (15s timeout in connectDB).
+  if (mongoose.connection.readyState !== 1) {
+    try { await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 }) } catch {}
+  }
   const state = mongoose.connection.readyState
-  res.status(200).json({ success: true, status: 'ok', db: state === 1 ? 'connected' : 'disconnected', timestamp: new Date().toISOString() })
+  const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' }
+  res.status(200).json({ success: true, status: 'ok', db: states[state] || state, readyState: state, timestamp: new Date().toISOString() })
 })
-app.get('/api/v1/health', (req, res) => {
+app.get('/api/v1/health', async (req, res) => {
+  if (mongoose.connection.readyState !== 1) {
+    try { await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 }) } catch {}
+  }
   const state = mongoose.connection.readyState
-  res.status(200).json({ success: true, status: 'ok', db: state === 1 ? 'connected' : 'disconnected' })
+  const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' }
+  res.status(200).json({ success: true, status: 'ok', db: states[state] || state, readyState: state })
 })
 
 // ----- routes -----

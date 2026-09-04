@@ -1,0 +1,185 @@
+===============================================================
+  VERCEL DEPLOYMENT GUIDE - Tour Management (MERN)
+===============================================================
+
+OVERVIEW
+--------
+You need TWO separate Vercel projects from the SAME repo:
+  1. Backend  - Root Directory: "backend"  -> Express API (serverless)
+  2. Frontend - Root Directory: "frontend" -> React CRA (static)
+Plus MongoDB Atlas (already in use).
+
+
+STEP 1 - MONGODB ATLAS NETWORK ACCESS (DO THIS FIRST!)
+-------------------------------------------------------
+Vercel serverless functions call Atlas from cloud IPs that change.
+You MUST allow all IPs:
+
+  1. Go to https://cloud.mongodb.com -> your project
+  2. Left sidebar -> Network Access
+  3. Click "+ Add IP Address"
+  4. Enter: 0.0.0.0/0
+  5. Comment: "Vercel serverless + local dev"
+  6. Click "Confirm"
+
+Without this, every database connection from Vercel will be refused.
+
+
+STEP 2 - BACKEND VERCEL PROJECT
+--------------------------------
+1. Go to https://vercel.com/new
+2. Import your GitHub repo: Vaibhavgupta4/tour-management
+3. Project Name: "tour-management-backend" (or anything)
+4. Root Directory:  backend           <-- IMPORTANT!
+5. Framework Preset:  "Other"
+6. Build Command:     (leave blank - no build needed for Express)
+7. Output Directory:  (leave blank)
+8. Click "Deploy" - may fail first time, that is OK.
+
+ENV VARS (Project Settings -> Environment Variables):
+  NODE_ENV       = production
+  MONGO_URI      = mongodb+srv://USER:PASS@cluster.mongodb.net/tour_booking?retryWrites=true&w=majority&appName=Cluster0
+  JWT_SECRET_KEY = (run: node -e "console.log(require('crypto').randomBytes(48).toString('hex'))")
+  FRONTEND_URL   = https://tour-management-frontend.vercel.app
+                   (set placeholder if frontend URL unknown yet)
+
+>>> Set ALL env vars for Production + Preview + Development. <<<
+
+9. Deployments -> "..." on latest -> "Redeploy" (clear cache if possible)
+10. Test: https://tour-management-backend.vercel.app/health
+    -> should show "db":"connected"
+
+
+STEP 3 - FRONTEND VERCEL PROJECT
+----------------------------------
+1. Go to https://vercel.com/new
+2. Import the SAME GitHub repo
+3. Project Name: "tour-management-frontend"
+4. Root Directory:  frontend          <-- IMPORTANT!
+5. Framework Preset:  "Create React App"
+6. Build Command:     npm run build (should auto-fill)
+7. Output Directory:  build (should auto-fill)
+8. Click "Deploy"
+
+ENV VARS:
+  REACT_APP_API_URL = https://tour-management-backend.vercel.app/api/v1
+
+  CRA bakes REACT_APP_ vars at BUILD TIME.
+  Changing this later requires a frontend REDEPLOY.
+
+9. Deployments -> "..." on latest -> "Redeploy"
+After deploy your frontend URL will be:
+  https://tour-management-frontend.vercel.app
+
+
+STEP 4 - WIRE CORS (UPDATE BACKEND FRONTEND_URL)
+--------------------------------------------------
+Now that you know the exact frontend URL:
+
+1. Backend Vercel -> Settings -> Environment Variables
+2. Update FRONTEND_URL to EXACT frontend origin:
+   FRONTEND_URL = https://tour-management-frontend.vercel.app
+   (no trailing slash, includes https://)
+3. Deployments -> "..." on latest -> "Redeploy"
+4. Verify: open frontend -> DevTools -> Network -> API calls 200
+
+
+STEP 5 - VERIFY EVERYTHING
+----------------------------
+A. Health:   GET https://tour-management-backend.vercel.app/health
+B. Tours:    GET https://tour-management-backend.vercel.app/api/v1/tours
+C. Frontend: https://tour-management-frontend.vercel.app
+D. Login/Register: open frontend -> Register/Login
+E. Booking:  Login -> select tour -> Book Now
+F. Mobile:   DevTools -> device toolbar -> check mobile navbar
+
+
+TROUBLESHOOTING
+================
+
+PROBLEM: "Database unavailable" or db: "disconnected"
+  -> Atlas Network Access: add 0.0.0.0/0 (Step 1!)
+  -> Check MONGO_URI env var (no typos)
+  -> Password with special chars must be URL-encoded:
+     "p@ss#word" becomes "p%40ss%23word" in the URI
+
+PROBLEM: CORS error in browser console
+  -> FRONTEND_URL must exactly match deployed frontend origin
+  -> After updating, REDEPLOY backend
+  -> curl test:
+     curl -H "Origin: https://your-frontend.vercel.app"
+          https://your-backend.vercel.app/api/v1/tours
+
+PROBLEM: Frontend shows localhost / API not connecting
+  -> REACT_APP_API_URL is missing or wrong
+  -> CRA bakes it at build time -> must REDEPLOY frontend
+  -> Verify: open frontend JS bundle, search for the API URL
+
+PROBLEM: Permission denied / exit code 126
+  -> Fixed! node_modules were committed. See commit 935de944.
+  -> If still happening: Redeploy -> Clear Cache
+
+PROBLEM: Page refresh shows 404 on /login etc
+  -> Already handled by frontend/vercel.json SPA rewrite
+  -> Verify vercel.json exists in frontend/ directory
+
+PROBLEM: Backend cold start takes 30+ seconds
+  -> Normal for Vercel free tier
+  -> First request after idle triggers cold start + DB connection
+  -> serverSelectionTimeoutMS = 15s max wait
+
+PROBLEM: connectDB process.exit(1) killing serverless function
+  -> Fixed: retry logic now skipped on Vercel (process.env.VERCEL)
+  -> Errors throw instead, returning 503 response
+
+
+ENV VARS COPY-PASTE
+=====================
+
+BACKEND (Vercel Dashboard -> Settings -> Environment Variables):
+  NODE_ENV       = production
+  MONGO_URI      = mongodb+srv://USER:PASS@cluster.mongodb.net/tour_booking?retryWrites=true&w=majority
+  JWT_SECRET_KEY = (run: node -e "console.log(require('crypto').randomBytes(48).toString('hex'))")
+  FRONTEND_URL   = https://tour-management-frontend.vercel.app
+
+FRONTEND (Vercel Dashboard -> Settings -> Environment Variables):
+  REACT_APP_API_URL = https://tour-management-backend.vercel.app/api/v1
+
+
+IMPORTANT NOTES
+=================
+
+1. TWO VERCEL PROJECTS from ONE repo, each with a different
+   Root Directory (backend / frontend).
+
+2. REACT_APP_API_URL is baked at BUILD TIME (frontend).
+   Changing it requires a frontend REDEPLOY.
+
+3. FRONTEND_URL (backend CORS) is read at RUNTIME (per request).
+   Changing it requires a backend REDEPLOY.
+
+4. MONGO_URI special characters must be URL-encoded:
+   Password "p@ss#word" -> "p%40ss%23word"
+
+5. Atlas free tier (M0) allows 512 MB storage.
+   Monitor at Atlas -> Collections.
+
+6. Vercel free tier: 100 GB bandwidth/month, 100 hrs compute.
+   Backend serverless functions have 10s timeout (Hobby plan).
+
+7. Backend entry point for Vercel:
+   backend/api/index.js  -> re-exports Express app
+   backend/vercel.json   -> rewrites all routes to /api function
+
+8. NEVER commit .env files. Use Vercel dashboard for secrets.
+
+
+QUICK REFERENCE URLs
+======================
+
+  Backend:   https://tour-management-backend.vercel.app
+  Frontend:  https://tour-management-frontend.vercel.app
+  Health:    https://tour-management-backend.vercel.app/health
+  Atlas:     https://cloud.mongodb.com
+  Vercel:    https://vercel.com/dashboard
+  GitHub:    https://github.com/Vaibhavgupta4/tour-management
